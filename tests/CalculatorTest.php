@@ -9,35 +9,36 @@ class CalculatorTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-
-        $this->_calculator = new Calculator();
     }
 
     /**
      * @dataProvider shortStringDataProvider
      */
-   /* public function testTheStringMinimalLength($string)
+    public function testTheStringMinimalLength($string)
     {
-        $this->_calculator->calculate($string);
-        $this->assertTrue($this->_calculator->hasError());
-    }*/
+        $calculator = new Calculator($string);
+        $calculator->checkSource($string);
+        $this->assertTrue($calculator->hasError());
+    }
 
     /**
      * @dataProvider stringValidationDataProvider
      */
-    /*public function testDataArrayIsValidation($expected, $string)
+    public function testDataArrayIsValidation($expected, $string)
     {
-        $this->_calculator->calculate($string);
-        $this->assertSame($expected, $this->_calculator->hasError());
-    }*/
+        $calculator = new Calculator($string);
+        $calculator->checkSource($string);
+        $this->assertSame($expected, $calculator->hasError());
+    }
 
     /**
      * @dataProvider stringDataProvider
      */
     public function testCalculate($expected, $string)
     {
-        $this->_calculator->calculate($string);
-        $this->assertSame($expected, $this->_calculator->getResult());
+        $calculator = new Calculator($string);
+        $calculator->checkSource($string);
+        $this->assertSame($expected, $calculator->calculate());
     }
 
 

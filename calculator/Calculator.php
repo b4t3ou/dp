@@ -7,34 +7,27 @@ class Calculator
     private $_availableOperators = ['+', '-', '*', '/'];
     private $_result;
 
-    public function calculate($string)
+    public function __construct($string)
     {
-        $this->_error = false;
         $this->_data  = explode(' ', $string);
-        $this->_checkString()
-            ->_checkDataStructure()
-            ->run();
+    }
+
+    public function calculate()
+    {
+        $this->_recursiveHigherResolver($this->_data);
+        $this->_recursiveLowerResolver($this->_data);
+
+        return $this->_result;
+    }
+
+    public function checkSource()
+    {
+        $this->_checkString()->_checkDataStructure();
     }
 
     public function hasError()
     {
         return $this->_error;
-    }
-
-    public function getResult()
-    {
-        return $this->_result;
-    }
-
-    private function run()
-    {
-        if ($this->_error)
-        {
-            return false;
-        }
-
-        $this->_recursiveHigherResolver($this->_data);
-        $this->_recursiveLowerResolver($this->_data);
     }
 
     private function _recursiveHigherResolver($data)
