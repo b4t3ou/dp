@@ -59,15 +59,7 @@ class Calculator
                     $data[$i - 1] = $data[$i - 1] / $data[$i + 1];
                 }
 
-                unset($data[$i]);
-                unset($data[$i + 1]);
-
-                $this->_data = [];
-                foreach ($data as $d)
-                {
-                    $this->_data[] = $d;
-                }
-
+                $data = $this->_rearrangeDataSet($data, $i);
                 $this->_recursiveHigherResolver($this->_data);
             }
         }
@@ -95,19 +87,25 @@ class Calculator
                     $data[$i - 1] = $data[$i - 1] - $data[$i + 1];
                 }
 
-                unset($data[$i]);
-                unset($data[$i + 1]);
-
-                $this->_data = [];
-
-                foreach ($data as $d)
-                {
-                    $this->_data[] = $d;
-                }
-
+                $data = $this->_rearrangeDataSet($data, $i);
                 $this->_recursiveLowerResolver($this->_data);
             }
         }
+    }
+
+    private function _rearrangeDataSet($rawData, $i)
+    {
+        unset($rawData[$i]);
+        unset($rawData[$i + 1]);
+
+        $this->_data = [];
+
+        foreach ($rawData as $d)
+        {
+            $this->_data[] = $d;
+        }
+
+        return $rawData;
     }
 
     private function _checkString()
