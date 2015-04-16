@@ -62,14 +62,13 @@ class CalculatorTest extends PHPUnit_Framework_TestCase
     public function stringDataProvider()
     {
         return [
-            [4, '2 * 2'],
-            [1, '2 / 2'],
             [5, '2 / 2 * 5'],
             [2, '1 + 1'],
+            [2, '1 + 1 + 5 - 5'],
             [14, '1 + 1 + 6 * 2'],
             [7, '1 + 12 / 2'],
-            [13, '1 + 12 / 2 * 2'],
-            [7, '2 * 2 + 3']
+            [12, '1 + 12 / 2 * 2 - 1'],
+            [5, '2 * 2 + 3 - 2']
         ];
     }
 

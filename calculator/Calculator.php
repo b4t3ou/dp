@@ -5,7 +5,6 @@ class Calculator
     private $_error = false;
     private $_data;
     private $_availableOperators = ['+', '-', '*', '/'];
-    private $_result;
 
     public function __construct($string)
     {
@@ -14,10 +13,9 @@ class Calculator
 
     public function calculate()
     {
-        $this->_recursiveHigherResolver($this->_data);
-        $this->_recursiveLowerResolver($this->_data);
+        $data = $this->_recursiveLowerResolver(1, $this->_recursiveHigherResolver(1, $this->_data));
 
-        return $this->_result;
+        return $data[0];
     }
 
     public function checkSource()
@@ -30,75 +28,77 @@ class Calculator
         return $this->_error;
     }
 
-    private function _recursiveHigherResolver($data)
+    private function _recursiveHigherResolver($key, $data)
     {
-        if (count($data) == 1)
+        if ($data[$key] == '*' || $data[$key] == '/')
         {
-            $this->_result = $data[0];
-            return;
-        }
-
-        for ($i = 1; $i < count($data); $i += 2)
-        {
-            if ($data[$i] == '*' || $data[$i] == '/')
+            switch ($data[$key])
             {
-                if ($data[$i] == '*')
-                {
-                    $data[$i - 1] = $data[$i - 1] * $data[$i + 1];
-
-                }
-                else if ($data[$i] == '/')
-                {
-                    $data[$i - 1] = $data[$i - 1] / $data[$i + 1];
-                }
-
-                $data = $this->_rearrangeDataSet($data, $i);
-                $this->_recursiveHigherResolver($this->_data);
+                case '*':
+                    $data[$key - 1] = $data[$key - 1] * $data[$key + 1];
+                    break;
+                case '/':
+                    $data[$key - 1] = $data[$key - 1] / $data[$key + 1];
+                    break;
             }
+
+            $data = $this->_rearrangeDataSet($data, $key);
         }
+        else
+        {
+            $key += 2;
+        }
+
+        if ($key < count($data) && count($data) >= 3)
+        {
+            $data = $this->_recursiveHigherResolver($key, $data);
+        }
+
+        return $data;
     }
 
-    private function _recursiveLowerResolver($data)
+    private function _recursiveLowerResolver($key, $data)
     {
-        if (count($data) == 1)
+        if (count($data) < 3)
         {
-            $this->_result = $data[0];
-            return;
+            return $data;
         }
 
-        for ($i = 1; $i < count($data); $i += 2)
+        if (($data[$key] == '+' || $data[$key] == '-'))
         {
-            if ($data[$i] == '+' || $data[$i] == '-')
+            switch ($data[$key])
             {
-                if ($data[$i] == '+')
-                {
-                    $data[$i - 1] = $data[$i - 1] + $data[$i + 1];
-
-                }
-                else if ($data[$i] == '-')
-                {
-                    $data[$i - 1] = $data[$i - 1] - $data[$i + 1];
-                }
-
-                $data = $this->_rearrangeDataSet($data, $i);
-                $this->_recursiveLowerResolver($this->_data);
+                case '+':
+                    $data[$key - 1] = $data[$key - 1] + $data[$key + 1];
+                    break;
+                case '-':
+                    $data[$key - 1] = $data[$key - 1] - $data[$key + 1];
+                    break;
             }
+
+            $data = $this->_rearrangeDataSet($data, $key);
         }
+
+        if ($key < count($data) && count($data) >= 3)
+        {
+            $data = $this->_recursiveLowerResolver($key, $data);
+        }
+
+        return $data;
     }
 
     private function _rearrangeDataSet($rawData, $i)
     {
+        $data = [];
         unset($rawData[$i]);
         unset($rawData[$i + 1]);
 
-        $this->_data = [];
-
         foreach ($rawData as $d)
         {
-            $this->_data[] = $d;
+            $data[] = $d;
         }
 
-        return $rawData;
+        return $data;
     }
 
     private function _checkString()
