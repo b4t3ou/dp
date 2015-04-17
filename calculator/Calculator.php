@@ -79,9 +79,7 @@ class Calculator
         unset($rawData[$i]);
         unset($rawData[$i + 1]);
 
-        $data = array_values($rawData);
-
-        return $data;
+        return array_values($rawData);
     }
 
     private function _checkString()
