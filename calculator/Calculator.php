@@ -5,6 +5,7 @@ class Calculator
     private $_error = false;
     private $_data;
     private $_availableOperators = ['+', '-', '*', '/'];
+    private $_higherOperands = ['*', '/'];
 
     public function __construct($string)
     {
@@ -30,61 +31,47 @@ class Calculator
 
     private function _recursiveHigherResolver($key, $data)
     {
-        if ($data[$key] == '*' || $data[$key] == '/')
-        {
-            switch ($data[$key])
-            {
-                case '*':
-                    $data[$key - 1] = $data[$key - 1] * $data[$key + 1];
-                    break;
-                case '/':
-                    $data[$key - 1] = $data[$key - 1] / $data[$key + 1];
-                    break;
-            }
-
-            $data = $this->_rearrangeDataSet($data, $key);
-        }
-        else
-        {
-            $key += 2;
-        }
-
-        if ($key < count($data) && count($data) >= 3)
-        {
-            $data = $this->_recursiveHigherResolver($key, $data);
-        }
-
-        return $data;
-    }
-
-    private function _recursiveLowerResolver($key, $data)
-    {
-        if (count($data) < 3)
+        if ($key >= count($data) || count($data) < 3)
         {
             return $data;
         }
 
-        if (($data[$key] == '+' || $data[$key] == '-'))
+        if (!in_array($data[$key], $this->_higherOperands))
         {
-            switch ($data[$key])
-            {
-                case '+':
-                    $data[$key - 1] = $data[$key - 1] + $data[$key + 1];
-                    break;
-                case '-':
-                    $data[$key - 1] = $data[$key - 1] - $data[$key + 1];
-                    break;
-            }
-
-            $data = $this->_rearrangeDataSet($data, $key);
+            return $this->_recursiveHigherResolver($key += 2, $data);
         }
 
-        if ($key < count($data) && count($data) >= 3)
+        switch ($data[$key])
         {
-            $data = $this->_recursiveLowerResolver($key, $data);
+            case '*':
+                $data[$key - 1] = $data[$key - 1] * $data[$key + 1];
+                break;
+            case '/':
+                $data[$key - 1] = $data[$key - 1] / $data[$key + 1];
+                break;
         }
 
-        return $data;
+        return $this->_recursiveHigherResolver($key, $this->_rearrangeDataSet($data, $key));
+    }
+
+    private function _recursiveLowerResolver($key, $data)
+    {
+        if (count($data) < 3 || $key > count($data))
+        {
+            return $data;
+        }
+
+        switch ($data[$key])
+        {
+            case '+':
+                $data[$key - 1] = $data[$key - 1] + $data[$key + 1];
+                break;
+            case '-':
+                $data[$key - 1] = $data[$key - 1] - $data[$key + 1];
+                break;
+        }
+
+        return $this->_recursiveLowerResolver($key, $this->_rearrangeDataSet($data, $key));
     }
 
     private function _rearrangeDataSet($rawData, $i)
