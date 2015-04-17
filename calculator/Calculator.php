@@ -89,14 +89,10 @@ class Calculator
 
     private function _rearrangeDataSet($rawData, $i)
     {
-        $data = [];
         unset($rawData[$i]);
         unset($rawData[$i + 1]);
 
-        foreach ($rawData as $d)
-        {
-            $data[] = $d;
-        }
+        $data = array_values($rawData);
 
         return $data;
     }
