@@ -5,7 +5,7 @@ class Calculator
     private $_error = false;
     private $_data;
     private $_availableOperators = ['+', '-', '*', '/'];
-    private $_higherOperands = ['*', '/'];
+    private $_higherOperators = ['*', '/'];
 
     public function __construct($string)
     {
@@ -14,7 +14,7 @@ class Calculator
 
     public function calculate()
     {
-        $data = $this->_recursiveLowerResolver(1, $this->_recursiveHigherResolver(1, $this->_data));
+        $data = $this->_resolver(1, $this->_resolver(1, $this->_data, true));
 
         return $data[0];
     }
@@ -29,18 +29,24 @@ class Calculator
         return $this->_error;
     }
 
-    private function _recursiveHigherResolver($key, $data)
+    private function _resolver($key, $data, $higher = false)
     {
         if ($key >= count($data) || count($data) < 3)
         {
             return $data;
         }
 
-        if (!in_array($data[$key], $this->_higherOperands))
+        if ($higher && !in_array($data[$key], $this->_higherOperators))
         {
-            return $this->_recursiveHigherResolver($key += 2, $data);
+            $key += 2;
+            return $this->_resolver($key, $data, $higher);
         }
 
+        return $this->_resolver($key, $this->_operation($data, $key), $higher);
+    }
+
+    private function _operation($data, $key)
+    {
         switch ($data[$key])
         {
             case '*':
@@ -49,20 +55,6 @@ class Calculator
             case '/':
                 $data[$key - 1] = $data[$key - 1] / $data[$key + 1];
                 break;
-        }
-
-        return $this->_recursiveHigherResolver($key, $this->_rearrangeDataSet($data, $key));
-    }
-
-    private function _recursiveLowerResolver($key, $data)
-    {
-        if (count($data) < 3 || $key > count($data))
-        {
-            return $data;
-        }
-
-        switch ($data[$key])
-        {
             case '+':
                 $data[$key - 1] = $data[$key - 1] + $data[$key + 1];
                 break;
@@ -71,15 +63,10 @@ class Calculator
                 break;
         }
 
-        return $this->_recursiveLowerResolver($key, $this->_rearrangeDataSet($data, $key));
-    }
+        unset($data[$key]);
+        unset($data[$key + 1]);
 
-    private function _rearrangeDataSet($rawData, $i)
-    {
-        unset($rawData[$i]);
-        unset($rawData[$i + 1]);
-
-        return array_values($rawData);
+        return array_values($data);
     }
 
     private function _checkString()
